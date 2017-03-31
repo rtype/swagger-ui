@@ -67,11 +67,19 @@ export default class ParamBody extends Component {
     }
   }
 
-  sample = (xml) => {
+  sample = (xml, consumesValue) => {
     let { param, fn:{inferSchema} } = this.props
-    let schema = inferSchema(param.toJS())
+    let jsParam=param.toJS()
 
-    return getSampleSchema(schema, xml)
+    /** Parse x-examples for body parameters for json only*/
+    if(!xml && jsParam["x-examples"]){
+
+      return jsParam["x-examples"][consumesValue] || jsParam["x-examples"].default
+
+    }else{
+        let schema = inferSchema(jsParam)
+        return getSampleSchema(schema, xml)
+    }
   }
 
   onChange = (value, { isEditBox, isXml }) => {
